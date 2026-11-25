@@ -1,86 +1,115 @@
-# Xiaomi Redmi 9A Linux (`xiaomi-redmi-9a-linux`)
+<div align="center">
 
-<p align="center">
-  <strong>Native GNU/Linux for the Xiaomi Redmi 9A (<code>blossom</code> / <code>dandelion</code> / <code>angelica</code> / <code>cattail</code>)</strong><br>
-  Powered by the MediaTek Helio G25 / MT6765 / MT6762G SoC
-</p>
+# Xiaomi Redmi 9A Linux
 
-<p align="center">
-  <a href="https://alpinelinux.org/"><img src="https://img.shields.io/badge/Distribution-Alpine_Linux-0D597F?logo=alpinelinux&logoColor=white" alt="Alpine Linux"></a>
-  <a href="https://sxmo.org/"><img src="https://img.shields.io/badge/Mobile_UI-Sxmo_(dwm)-1793d1" alt="Sxmo"></a>
-  <a href="https://pipewire.org/"><img src="https://img.shields.io/badge/Audio-PipeWire-blue" alt="PipeWire"></a>
-  <a href="https://img.shields.io/badge/GPU-PowerVR_GE8320_3D-green"><img src="https://img.shields.io/badge/GPU-PowerVR_GE8320_3D-green" alt="3D Accelerated"></a>
-  <a href="https://img.shields.io/badge/Boot-Safe_MicroSD_(Zero_eMMC_Risk)-success"><img src="https://img.shields.io/badge/Boot-Safe_MicroSD_(Zero_eMMC_Risk)-success" alt="Safe MicroSD Boot"></a>
-  <a href="https://img.shields.io/badge/AI_Assisted-Antigravity_/_Google_DeepMind-purple"><img src="https://img.shields.io/badge/AI_Assisted-Antigravity_/_Google_DeepMind-purple" alt="AI Assisted"></a>
-</p>
+**True Native GNU/Linux for the Xiaomi Redmi 9A (`dandelion` / `blossom`)**  
+Powered by the MediaTek Helio G25 (MT6765) · Alpine Linux (`aarch64` / `musl`) · Sxmo (`dwm`)
 
----
+[![Alpine Linux](https://img.shields.io/badge/OS-Alpine_Linux_aarch64-0D597F?style=flat-square&logo=alpinelinux&logoColor=white)](https://alpinelinux.org/)
+[![Sxmo](https://img.shields.io/badge/UI-Sxmo_(dwm)-1793D1?style=flat-square)](https://sxmo.org/)
+[![Kernel](https://img.shields.io/badge/Kernel-Linux_4.19-FCC624?style=flat-square&logo=linux&logoColor=black)](https://github.com/xiaomi-redmi-9a-linux/kernel_xiaomi_blossom_linux)
+[![GPU](https://img.shields.io/badge/GPU-PowerVR_GE8320_3D-2EA44F?style=flat-square)](https://github.com/xiaomi-redmi-9a-linux/libhybris)
+[![Audio](https://img.shields.io/badge/Audio-PipeWire_%2B_MT6357-0A66C2?style=flat-square)](https://pipewire.org/)
+[![Boot](https://img.shields.io/badge/Boot-MicroSD_Only_(eMMC_Safe)-1F883D?style=flat-square)](#-safety--non-destructive-boot)
 
-## 🌟 Overview
-
-The **`xiaomi-redmi-9a-linux`** organization hosts the complete kernel source code, patched userland libraries, and system overlays required to run full native GNU/Linux on the **Xiaomi Redmi 9A** family of devices.
-
-Instead of running an Android container, chroot, or PRoot, this project brings **true native Linux** (Alpine Linux / postmarketOS with the lightweight **Sxmo** mobile environment) directly to the bare metal, featuring:
-- **Non-destructive MicroSD Boot**: Boots completely from an external MicroSD card loop image. The phone's internal eMMC flash (`/dev/mmcblk0*`) is strictly protected and left untouched.
-- **Hardware 3D Acceleration**: Custom 64-bit musl compatibility layer in `libhybris` allowing native GLES applications to harness the PowerVR Rogue GE8320 GPU at ~390+ FPS.
-- **In-Kernel Power Management**: Dedicated autonomous MT6357 PMIC fuelgauge with internal-resistance compensation and real-time battery status in `/sys/class/power_supply/battery`.
-- **Integrated Mobile Audio**: PipeWire & WirePlumber routing directly to the MediaTek MT6357 DL2 audio path with working hardware volume buttons and statusbar indicators.
+</div>
 
 ---
 
-## 📱 Hardware Support Status
+## Overview
 
-| Subsystem | Driver / Implementation | Status | Details |
-| :--- | :--- | :---: | :--- |
-| **CPU / SoC** | MediaTek MT6765 (Helio G25) | 🟢 **Working** | Octa-core Cortex-A53 with DVFS governor |
-| **Display** | SimpleFB / Framebuffer (`/dev/fb0`) | 🟢 **Working** | 720 × 1600 resolution @ 60 Hz |
-| **3D GPU Acceleration** | PowerVR Rogue GE8320 (Series 8XE) | 🟢 **Working** | Patched `libhybris` + DDK 1.13, ~395 FPS compute |
-| **Touchscreen** | Novatek / FocalTech Multi-touch | 🟢 **Working** | Firmware loaded via kernel initramfs |
-| **Audio (Speaker / I2S)** | MediaTek MT6357 ALSA SoC | 🟢 **Working** | PipeWire, hardware volume keys (`mtk-kpd`), Sxmo statusbar |
-| **Internal Wi-Fi** | MediaTek WMT (`wlan0`) | 🟢 **Working** | Firmware loaded via `mtk-wmt-loader` |
-| **Internal Bluetooth** | MediaTek MT6631 Bluetooth 5.0 | 🟢 **Working** | Native BlueZ 5.86 stack via `mtk-bt-bridge` |
-| **Battery / Fuelgauge** | MT6357 In-Kernel Fuelgauge | 🟢 **Working** | Autonomous IR-compensated OCV tracking & smooth stepping |
-| **Backlight Control** | MediaTek LCD Backlight (`lcd-backlight`)| 🟢 **Working** | Controlled via `brightnessctl` |
-| **Buttons & Input** | MediaTek Keypad (`mtk-kpd`) | 🟢 **Working** | Volume Up/Down, Power button |
-| **USB Serial & Network** | Linux ConfigFS (RNDIS & ACM) | 🟢 **Working** | Direct root shell over USB (`ttyGS0`) and USB tethering |
-| **Storage / Boot** | MicroSD (`/dev/mmcblk1p1`) | 🟢 **Working** | Non-destructive loopback rootfs; eMMC completely safe |
+**`xiaomi-redmi-9a-linux`** builds and maintains the kernel, `libhybris` patches, native system daemons, and Alpine Linux + **Sxmo** rootfs overlay required to run **bare-metal native Linux** on the **Xiaomi Redmi 9A** (MediaTek Helio G25 / MT6765).
+
+Unlike Android chroots or PRoot containers, the system boots directly into a native Linux userspace from an external **MicroSD card** while leaving the device's internal flash completely untouched:
+
+* **Zero eMMC Risk:** Boots via `fastboot` into a custom Linux 4.19 `boot-linux.img` and mounts an `ext4` loopback rootfs from MicroSD (`/dev/mmcblk1p1` → `/dev/loop0`). Removing the SD card and flashing stock boot restores Android immediately.
+* **Hardware 3D Acceleration (`musl` + `libhybris`):** Custom 64-bit `musl` libc compatibility and Treble `/dev/fb0` gralloc fallback enable PowerVR Rogue GE8320 hardware GLES rendering (~395 FPS raw benchmark, 650 MHz DVFS).
+* **Lightweight Native Daemons:** Purpose-built Rust and C daemons replace heavy Android/Python services for WMT connectivity loading (`< 4 kB` VmRSS), BlueZ 5.86 bridging, FreeDesktop sensor proxying, FM radio, jack detection, and framebuffer power control.
+* **Autonomous In-Kernel Power & Battery:** In-kernel MT6357 IR-compensated OCV fuelgauge plus runtime CPU hotplugging and efficiency-core standby (`cpu4` @ 400 MHz).
 
 ---
 
-## 🗂️ Core Repositories
+## Repositories
 
-| Repository | Purpose |
+| Repository | Description |
 | :--- | :--- |
-| [**`kernel_xiaomi_blossom_linux`**](https://github.com/xiaomi-redmi-9a-linux/kernel_xiaomi_blossom_linux) | Custom Linux kernel tailored for Redmi 9A. Includes in-kernel MT6357 fuelgauge, VKMS PRIME buffer sharing, CMDQ 32-bit compat ioctls, and MicroSD rootfs boot architecture. |
-| [**`libhybris`**](https://github.com/xiaomi-redmi-9a-linux/libhybris) | Fork of `libhybris` patched with full **64-bit musl libc** compatibility, Android 10 (Q) dynamic linker relocations, and direct `/dev/fb0` double-buffered gralloc fallback for Treble. |
-| [**`xiaomi-redmi-9a-linux`**](https://github.com/xiaomi-redmi-9a-linux/xiaomi-redmi-9a-linux) | Rootfs overlay, automated MicroSD installer scripts, Sxmo device profiles, and system services for Alpine Linux / postmarketOS. |
+| [**`kernel_xiaomi_blossom_linux`**](https://github.com/xiaomi-redmi-9a-linux/kernel_xiaomi_blossom_linux) | Linux 4.19 kernel for Redmi 9A (`blossom_linux_defconfig`) with PowerVR Rogue DDK `1.13`, autonomous MT6357 fuelgauge, VKMS PRIME, CMDQ compat, embedded firmware, early initramfs, and `boot-linux.img` build/flash tools. |
+| [**`xiaomi-redmi-9a-linux`**](https://github.com/xiaomi-redmi-9a-linux/xiaomi-redmi-9a-linux) | Alpine Linux + Sxmo rootfs overlay, native Rust & C userspace daemons (`src/`), standalone `linux-rootfs.ext4` & MicroSD installers (`scripts/`), and detailed hardware subsystem docs (`docs/`). |
+| [**`libhybris`**](https://github.com/xiaomi-redmi-9a-linux/libhybris) | Patched `libhybris` fork adding 64-bit `musl` libc hooks, Android 10/11 dynamic linker relocation support, and direct `/dev/fb0` double-buffered gralloc fallback for Treble HALs. |
+| [**`gst-droid`**](https://github.com/xiaomi-redmi-9a-linux/gst-droid) | GStreamer 1.0 Android camera & hardware codec integration stack (`droidmedia`, `nemo-gst-interfaces`, `gst-droid`). |
 
 ---
 
-## 🤖 Acknowledgment of AI Assistance
+## Hardware Support Matrix
 
-This project has been developed in intensive, continuous collaboration with artificial intelligence:
-
-- **AI Collaboration**: Co-engineered, debugged, and architected with **Antigravity** (powered by **Google DeepMind** models).
-- **Scope of AI Involvement**:
-  - **Kernel Subsystem Engineering**: Diagnosing and implementing 32-bit `CMDQ_IOCTL_ASYNC_EXEC_32` compatibility ioctls, memory mapping with ION virtual address fallback, and VKMS PRIME buffer export/import.
-  - **Power & PMIC Architecture**: Designing the autonomous in-kernel MT6357 battery fuelgauge driver with internal-resistance compensation and state-of-charge calculation, removing the need for Android-specific userspace daemons (`healthd`).
-  - **Reverse Engineering & Driver Interop**: Analyzing proprietary Android vendor blobs, diagnosing 64-bit musl libc TLS slot offsets, and writing the direct framebuffer fallback for Android 10 Treble HALs.
-  - **System Integration**: Configuring PipeWire ALSA hardware mixers, debugging udev rules, and optimizing Sxmo mobile shell performance.
-
-We believe in radical transparency: high-level systems programming and hardware bring-up on modern SoCs are vastly accelerated when human passion and intuition are paired with state-of-the-art AI reasoning.
+| Subsystem | Implementation | Status | Notes |
+| :--- | :--- | :---: | :--- |
+| **SoC / CPU** | MediaTek MT6765 (Helio G25) | Working | 8× Cortex-A53 up to 2.0 GHz with DVFS |
+| **Display & Backlight** | `mtkfb` (`/dev/fb0`) + PWM `lcd-backlight` | Working | 720 × 1600 @ 60 Hz, X11 + Sxmo (`dwm`), `mtk-fb-blank` |
+| **3D GPU** | PowerVR Rogue GE8320 (DDK `1.13@5776728`) | Working | Patched 64-bit `musl` `libhybris`, ~395 FPS raw GLES, 650 MHz DVFS |
+| **Touchscreen** | Novatek / FocalTech multi-touch | Working | Firmware embedded in kernel image |
+| **Audio & Jack** | MT6357 ALSA SoC + PipeWire (S16LE) | Working | Speaker + automatic 3.5 mm jack switching (`sxmo_jackmon`) |
+| **FM Radio** | MT6631 FM receiver (`mtk_fm`) | Working | Native Rust GTK3 touch app (`fm_radio_gui`), seek/scan, speaker & headphone routing |
+| **Wi-Fi** | MediaTek WMT SDIO (`wlan0`) | Working | Native Rust `mtk-wmt-loader`, `wpa_supplicant` + `nl80211` `nmcli` bridge |
+| **Bluetooth** | MediaTek MT6631 Bluetooth 5.0 | Working | BlueZ 5.86 via native Rust `mtk-bt-bridge` |
+| **Sensors** | `net.hadess.SensorProxy` | Working | Native Rust `mtk-sensor-proxy` (accelerometer, ambient light, proximity) |
+| **Battery & Power** | In-kernel MT6357 fuelgauge + hotplug | Working | IR-compensated OCV tracking, screen-off `cpu4` @ 400 MHz standby |
+| **Buttons & Input** | `mtk-kpd` + `bonsaid` | Working | Power (lock/wake + long-press menu) & Volume Up/Down (`xob` OSD) |
+| **USB Gadget** | ConfigFS RNDIS / CDC-NCM & ACM | Working | USB Ethernet networking + serial root shell (`/dev/ttyGS0`) |
+| **GPS / GNSS** | MT6631 STP (`/dev/stpgps`, `/dev/gps_emi`) | Investigated | Kernel devices active; requires MediaTek `mnld` for NMEA fix calculation |
+| **Camera / Media** | `gst-droid` (`droidmedia`) | WIP | Integration repository for Android camera & Stagefright codecs |
 
 ---
 
-## 📜 Safety & Disclaimer
+## Custom Native Daemons & Tools
 
-This project is experimental and provided for research, hacking, and hobbyist purposes. 
+Built natively for `aarch64` Alpine (`musl`) inside [`xiaomi-redmi-9a-linux/src/`](https://github.com/xiaomi-redmi-9a-linux/xiaomi-redmi-9a-linux/tree/main/src):
+
+* **`mtk-wmt-loader`** *(Rust)* — Replaces `wmt-pyloader` for MediaTek MT6765/MT6631 STP & firmware loading (`< 4 kB` RSS).
+* **`mtk-bt-bridge`** *(Rust)* — Bridges `/dev/stpbt` to BlueZ 5.86 over HCI.
+* **`mtk-sensor-proxy`** *(Rust)* — Exposes accelerometer, ALS, and proximity over `net.hadess.SensorProxy`.
+* **`fm_radio_gui` & `mtk_fm`** *(Rust GTK3 + C)* — Touch-friendly FM radio UI and hardware tuner/routing daemon.
+* **`sxmo_jackmon` & `mtk-fb-blank`** *(C)* — Instant 3.5 mm jack audio routing and framebuffer/touchscreen sleep control.
+
+---
+
+## Quick Start
+
+1. **Prepare a MicroSD card** (8 GB+) or build a standalone `linux-rootfs.ext4` loopback image using [`xiaomi-redmi-9a-linux`](https://github.com/xiaomi-redmi-9a-linux/xiaomi-redmi-9a-linux):
+   ```bash
+   git clone https://github.com/xiaomi-redmi-9a-linux/xiaomi-redmi-9a-linux.git
+   cd xiaomi-redmi-9a-linux
+   sudo ./scripts/install-sd.sh /dev/sdX   # Replace /dev/sdX with your SD card
+   ```
+2. **Build or download `boot-linux.img`** from [`kernel_xiaomi_blossom_linux`](https://github.com/xiaomi-redmi-9a-linux/kernel_xiaomi_blossom_linux):
+   ```bash
+   git clone https://github.com/xiaomi-redmi-9a-linux/kernel_xiaomi_blossom_linux.git
+   cd kernel_xiaomi_blossom_linux
+   ./build.sh kernel && ./build.sh boot
+   ```
+3. **Boot via Fastboot** (with the MicroSD card inserted):
+   ```bash
+   fastboot flash boot out-linux/boot-linux.img
+   fastboot reboot
+   ```
+
+Full step-by-step instructions and subsystem architecture docs live in [`xiaomi-redmi-9a-linux/docs/`](https://github.com/xiaomi-redmi-9a-linux/xiaomi-redmi-9a-linux/tree/main/docs).
+
+---
+
+## Safety & Non-Destructive Boot
 
 > [!IMPORTANT]
-> The kernel and boot scripts are deliberately built with safety guards to **never touch or mount the internal eMMC (`/dev/mmcblk0*`)**. Your stock Android/MIUI operating system, partition table, and userdata remain untouched on the phone's internal storage. Removing the MicroSD card allows the device to boot normally into Android.
+> The kernel initramfs, rootfs builder, and installer scripts are engineered **never to touch, mount, or modify internal eMMC (`/dev/mmcblk0*`)**. Your stock Android/MIUI installation and userdata remain intact on internal storage.
 
 ---
 
-## 🤝 Contributing
+## AI-Assisted Engineering
 
-Issues, pull requests, and discussions are welcome! If you own a **Xiaomi Redmi 9A (`blossom` / `dandelion`)**, **Redmi 9C / NFC (`angelica` / `cattail`)**, or any other MT6765/MT6762 device, feel free to join in testing, reporting issues, or porting new features.
+This port was co-engineered in collaboration with **Antigravity (Google DeepMind)** across kernel driver bring-up (CMDQ compat ioctls, VKMS PRIME, MT6357 fuelgauge), 64-bit `musl` `libhybris` adaptation, native Rust/C daemon development, and Sxmo/PipeWire system integration.
+
+---
+
+## Contributing
+
+Issues, PRs, and hardware test reports are welcome—especially for **Redmi 9A (`blossom` / `dandelion`)** and sibling **MT6765 / MT6762** devices (`angelica`, `cattail`). Please check the subsystem documentation in [`xiaomi-redmi-9a-linux/docs/`](https://github.com/xiaomi-redmi-9a-linux/xiaomi-redmi-9a-linux/tree/main/docs) before opening pull requests.
